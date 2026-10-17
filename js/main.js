@@ -1,7 +1,21 @@
 /* ==========================================================================
    Anaya Bika Point — interaction layer
-   Vanilla JS, no dependencies. Every block is defensive: a failure in one
+   Vanilla JS, zero dependencies. Every block is defensive: a failure in one
    feature must never break the rest of the page.
+
+   Modules
+     1. Live open / closed status (IST)
+     2. Hero carousel
+     3. Mobile menu
+     4. Fluid scroll dampening (custom RAF lerp, Lenis-style, opt-in)
+     5. Scroll-linked visuals (progress bar, --sy, header state)
+     6. Scroll reveal (IntersectionObserver, staggered)
+     7. Active navigation
+     8. Image fallbacks (drop-in friendly)
+     9. Pointer tilt on the shop-front frame
+    10. Pointer bloom (--mx / --my) + trust-card spotlight (--cx / --cy)
+    11. Hero parallax layers
+    12. Footer year
    ========================================================================== */
 (function () {
   "use strict";
@@ -16,6 +30,11 @@
   var HOURS_LABEL = "10:00 AM - 9:00 PM";
   var CAROUSEL_DELAY = 5200;
 
+  /* Smooth scrolling tuning (higher = snappier, lower = more glide). */
+  var SCROLL_EASE = 0.16;
+  var SCROLL_EPSILON = 0.6;
+  var SMOOTH_MIN_WIDTH = 1024;
+
   var reduceMotion = false;
   try {
     reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -23,11 +42,45 @@
     reduceMotion = false;
   }
 
+  /* ------------------------------------------------------------------------
+     Small helpers
+     ---------------------------------------------------------------------- */
   function logError(scope, err) {
     // Descriptive, non-fatal logging to simplify debugging.
     if (window.console && typeof window.console.warn === "function") {
       window.console.warn("[Anaya Bika Point] " + scope + " failed:", err);
     }
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function lerp(from, to, amount) {
+    return from + (to - from) * amount;
+  }
+
+  function isFinePointer() {
+    try {
+      return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function scrollTopNow() {
+    return window.pageYOffset || document.documentElement.scrollTop || 0;
+  }
+
+  function maxScroll() {
+    var doc = document.documentElement;
+    var body = document.body;
+    var height = Math.max(
+      doc ? doc.scrollHeight : 0,
+      body ? body.scrollHeight : 0,
+      body ? body.offsetHeight : 0
+    );
+    return Math.max(0, height - window.innerHeight);
   }
 
   /* ------------------------------------------------------------------------
@@ -70,7 +123,7 @@
         state: "closed",
         badge: "Closed on Fridays",
         short: "Closed on Fridays",
-        detail: "Friday is our weekly off · Back open Saturday at 10:00 AM"
+        detail: "Friday is our weekly off \u00b7 Back open Saturday at 10:00 AM"
       };
     }
 
@@ -79,27 +132,27 @@
         state: "open",
         badge: "Open Today (10 AM - 9 PM)",
         short: "Open Today (10 AM - 9 PM)",
-        detail: "Open now · " + HOURS_LABEL + " (IST)"
+        detail: "Open now \u00b7 " + HOURS_LABEL + " (IST)"
       };
     }
 
     if (storeTime.minutes < OPEN_MINUTES) {
       return {
         state: "closed",
-        badge: "Closed now · Opens 10:00 AM",
+        badge: "Closed now \u00b7 Opens 10:00 AM",
         short: "Opens today at 10 AM",
-        detail: "Opens today at 10:00 AM · " + HOURS_LABEL + " (IST)"
+        detail: "Opens today at 10:00 AM \u00b7 " + HOURS_LABEL + " (IST)"
       };
     }
 
     var nextIsFriday = storeTime.weekday === "Thu";
     return {
       state: "closed",
-      badge: "Closed now · Opens tomorrow",
+      badge: "Closed now \u00b7 Opens tomorrow",
       short: "Closed now",
       detail: nextIsFriday
-        ? "Closed for today · Reopens Sunday at 10:00 AM (Friday weekly off)"
-        : "Closed for today · Reopens tomorrow at 10:00 AM"
+        ? "Closed for today \u00b7 Reopens Sunday at 10:00 AM (Friday weekly off)"
+        : "Closed for today \u00b7 Reopens tomorrow at 10:00 AM"
     };
   }
 
@@ -403,7 +456,178 @@
   }
 
   /* ------------------------------------------------------------------------
-     4. Scroll reveal
+     4. Fluid scroll dampening
+     A Lenis-style wheel lerp: wheel deltas are accumulated into a target
+     offset and the window is eased toward it on requestAnimationFrame.
+     Disabled for reduced motion, touch devices, and narrow viewports —
+     never hijack a scroll we cannot reproduce faithfully.
+     ---------------------------------------------------------------------- */
+  function initSmoothScroll() {
+    if (reduceMotion) return;
+    if (!isFinePointer()) return;
+    if (window.innerWidth < SMOOTH_MIN_WIDTH) return;
+
+    var target = scrollTopNow();
+    var current = target;
+    var running = false;
+    var frameId = null;
+    var lastApplied = 0;
+
+    function apply(position) {
+      lastApplied = Date.now();
+      try {
+        window.scrollTo({ top: position, left: 0, behavior: "instant" });
+      } catch (err) {
+        window.scrollTo(0, position);
+      }
+    }
+
+    function stop() {
+      running = false;
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+        frameId = null;
+      }
+    }
+
+    function tick() {
+      frameId = null;
+      if (!running) return;
+
+      current = scrollTopNow();
+      var distance = target - current;
+
+      if (Math.abs(distance) <= SCROLL_EPSILON) {
+        current = target;
+        apply(target);
+        running = false;
+        return;
+      }
+
+      var nextTop = current + distance * SCROLL_EASE;
+      // Snap within a pixel so the loop always terminates.
+      if (Math.abs(target - nextTop) < SCROLL_EPSILON) nextTop = target;
+      apply(nextTop);
+
+      frameId = window.requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      if (frameId === null) {
+        frameId = window.requestAnimationFrame(tick);
+      }
+    }
+
+    function normalizeDelta(event) {
+      var delta = event.deltaY;
+      if (event.deltaMode === 1) {
+        // Lines.
+        delta *= 16;
+      } else if (event.deltaMode === 2) {
+        // Pages.
+        delta *= window.innerHeight;
+      }
+      // Guard against runaway trackpad spikes.
+      return clamp(delta, -240, 240);
+    }
+
+    function onWheel(event) {
+      if (event.ctrlKey || event.defaultPrevented) return;
+      if (document.body.classList.contains("is-locked")) return;
+      if (event.target && event.target.closest && event.target.closest("[data-native-scroll]")) return;
+
+      var limit = maxScroll();
+      if (limit <= 0) return;
+
+      // Re-sync when the page moved outside of our loop (scrollbar, keyboard).
+      if (!running) {
+        current = scrollTopNow();
+        target = current;
+      }
+
+      var delta = normalizeDelta(event);
+      if (!delta) return;
+
+      var nextTarget = clamp(target + delta, 0, limit);
+      if (nextTarget === target) return;
+
+      event.preventDefault();
+      target = nextTarget;
+      start();
+    }
+
+    // Any scroll we did not produce means the user took over: re-sync.
+    function onNativeScroll() {
+      if (Date.now() - lastApplied < 140) return;
+      current = scrollTopNow();
+      target = current;
+      stop();
+    }
+
+    function onResize() {
+      if (window.innerWidth < SMOOTH_MIN_WIDTH) {
+        stop();
+      }
+      target = clamp(target, 0, maxScroll());
+    }
+
+    try {
+      window.addEventListener("wheel", onWheel, { passive: false });
+      window.addEventListener("scroll", onNativeScroll, { passive: true });
+      window.addEventListener("resize", onResize, { passive: true });
+    } catch (err) {
+      logError("smooth scroll listeners", err);
+    }
+
+    // Keep the frame loop honest if the tab was backgrounded mid-glide.
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        stop();
+        current = scrollTopNow();
+        target = current;
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------------
+     5. Scroll-linked visuals: progress bar, ambient drift, header state
+     ---------------------------------------------------------------------- */
+  function initScrollVisuals() {
+    var root = document.documentElement;
+    var header = document.getElementById("siteHeader");
+    var frame = null;
+
+    function paint() {
+      frame = null;
+
+      var scrollY = scrollTopNow();
+      var limit = maxScroll();
+      var progress = limit > 0 ? clamp(scrollY / limit, 0, 1) : 0;
+
+      // Unitless scroll distance consumed by calc() in the ambient layer.
+      root.style.setProperty("--sy", scrollY.toFixed(2));
+      root.style.setProperty("--progress", progress.toFixed(4));
+
+      if (header) {
+        header.classList.toggle("is-scrolled", scrollY > 14);
+      }
+    }
+
+    function schedule() {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(paint);
+    }
+
+    paint();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("load", schedule);
+  }
+
+  /* ------------------------------------------------------------------------
+     6. Scroll reveal
      ---------------------------------------------------------------------- */
   function initReveal() {
     var items = document.querySelectorAll(".reveal");
@@ -425,42 +649,33 @@
             obs.unobserve(entry.target);
           });
         },
-        { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+        { rootMargin: "0px 0px -10% 0px", threshold: 0.08 }
       );
 
       for (var j = 0; j < items.length; j += 1) {
         observer.observe(items[j]);
       }
+
+      // Anything already painted above the fold should not wait for a scroll.
+      window.requestAnimationFrame(function () {
+        for (var k = 0; k < items.length; k += 1) {
+          var rect = items[k].getBoundingClientRect();
+          if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
+            items[k].classList.add("is-visible");
+          }
+        }
+      });
     } catch (err) {
       logError("scroll reveal", err);
-      for (var k = 0; k < items.length; k += 1) {
-        items[k].classList.add("is-visible");
+      for (var m = 0; m < items.length; m += 1) {
+        items[m].classList.add("is-visible");
       }
     }
   }
 
   /* ------------------------------------------------------------------------
-     5. Header state + active navigation
+     7. Active navigation
      ---------------------------------------------------------------------- */
-  function initHeader() {
-    var header = document.getElementById("siteHeader");
-    if (!header) return;
-
-    var ticking = false;
-
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(function () {
-        header.classList.toggle("is-scrolled", window.pageYOffset > 14);
-        ticking = false;
-      });
-    }
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-  }
-
   function initActiveNav() {
     var links = Array.prototype.slice.call(document.querySelectorAll(".nav-link"));
     if (!links.length || !("IntersectionObserver" in window)) return;
@@ -507,7 +722,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     6. Image fallbacks (drop-in friendly)
+     8. Image fallbacks (drop-in friendly)
      ---------------------------------------------------------------------- */
   function markMissing(img) {
     img.classList.add("is-missing");
@@ -533,17 +748,12 @@
   }
 
   /* ------------------------------------------------------------------------
-     7. Subtle pointer tilt on the shop-front frame
+     9. Subtle pointer tilt on the shop-front frame
      ---------------------------------------------------------------------- */
   function initTilt() {
     if (reduceMotion) return;
 
-    var finePointer = true;
-    try {
-      finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    } catch (err) {
-      finePointer = false;
-    }
+    var finePointer = isFinePointer();
     if (!finePointer) return;
 
     var targets = document.querySelectorAll("[data-tilt]");
@@ -582,7 +792,77 @@
   }
 
   /* ------------------------------------------------------------------------
-     8. Hero parallax layers
+     10. Pointer bloom + trust-card spotlight
+     ---------------------------------------------------------------------- */
+  function initPointerGlow() {
+    if (reduceMotion || !isFinePointer()) return;
+
+    var root = document.documentElement;
+    var frame = null;
+    var lastX = 0;
+    var lastY = 0;
+
+    function paint() {
+      frame = null;
+      var width = window.innerWidth || 1;
+      var height = window.innerHeight || 1;
+      root.style.setProperty("--mx", ((lastX / width) * 100).toFixed(2) + "%");
+      root.style.setProperty("--my", ((lastY / height) * 100).toFixed(2) + "%");
+    }
+
+    window.addEventListener(
+      "mousemove",
+      function (event) {
+        lastX = event.clientX;
+        lastY = event.clientY;
+        if (frame !== null) return;
+        frame = window.requestAnimationFrame(paint);
+      },
+      { passive: true }
+    );
+
+    // Per-card spotlight for the trust grid (gold radial follows the cursor).
+    var cards = document.querySelectorAll("[data-spotlight]");
+    for (var i = 0; i < cards.length; i += 1) {
+      (function (card) {
+        var raf = null;
+        var px = 50;
+        var py = 0;
+
+        function apply() {
+          raf = null;
+          card.style.setProperty("--cx", px.toFixed(2) + "%");
+          card.style.setProperty("--cy", py.toFixed(2) + "%");
+        }
+
+        card.addEventListener(
+          "pointermove",
+          function (event) {
+            var rect = card.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+            px = ((event.clientX - rect.left) / rect.width) * 100;
+            py = ((event.clientY - rect.top) / rect.height) * 100;
+            if (raf !== null) return;
+            raf = window.requestAnimationFrame(apply);
+          },
+          { passive: true }
+        );
+
+        card.addEventListener("pointerleave", function () {
+          px = 50;
+          py = 0;
+          if (raf !== null) {
+            window.cancelAnimationFrame(raf);
+            raf = null;
+          }
+          apply();
+        });
+      })(cards[i]);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     11. Hero parallax layers
      ---------------------------------------------------------------------- */
   function initParallax() {
     var layers = document.querySelectorAll("[data-parallax]");
@@ -602,14 +882,14 @@
 
     function apply() {
       frame = null;
-      var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var scrollY = scrollTopNow();
 
       for (var i = 0; i < layers.length; i += 1) {
         var layer = layers[i];
         var factor = parseFloat(layer.getAttribute("data-parallax"));
         if (isNaN(factor)) factor = 0;
         // Clamp travel so the glow never runs away on very long pages.
-        var offset = Math.max(-160, Math.min(160, scrollY * factor));
+        var offset = clamp(scrollY * factor, -160, 160);
         layer.style.setProperty("--parallax-y", offset.toFixed(2) + "px");
       }
     }
@@ -625,7 +905,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     9. Footer year
+     12. Footer year
      ---------------------------------------------------------------------- */
   function initYear() {
     var year = document.getElementById("year");
@@ -638,13 +918,15 @@
      ---------------------------------------------------------------------- */
   function boot() {
     var tasks = [
+      ["smooth scroll", initSmoothScroll],
+      ["scroll visuals", initScrollVisuals],
       ["status", initStatus],
       ["carousel", initCarousel],
       ["mobile menu", initMobileMenu],
       ["reveal", initReveal],
-      ["header", initHeader],
       ["active nav", initActiveNav],
       ["image fallbacks", initImageFallbacks],
+      ["pointer glow", initPointerGlow],
       ["tilt", initTilt],
       ["parallax", initParallax],
       ["year", initYear]

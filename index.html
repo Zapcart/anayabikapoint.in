@@ -35,10 +35,11 @@
     property="og:description"
     content="Kurla West's most trusted & premium 2-wheeler hub. Spare parts, sales, repair & service on CST Road. Open Mon–Sun, 10 AM – 9 PM. Closed Fridays."
   />
-  <meta property="og:image" content="https://anayabikapoint.in/assets/shopfront.png" />
+  <meta property="og:image" content="https://anayabikapoint.in/assets/og-cover.jpg" />
   <meta property="og:image:alt" content="Anaya Bika Point bike shop front on CST Road, Kurla West" />
   <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="900" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
 
   <!-- ================= TWITTER ================= -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -47,11 +48,13 @@
     name="twitter:description"
     content="2-wheeler spare parts, sales, repair & service in Kurla West, Mumbai. Call or WhatsApp 9324396437."
   />
-  <meta name="twitter:image" content="https://anayabikapoint.in/assets/shopfront.png" />
+  <meta name="twitter:image" content="https://anayabikapoint.in/assets/og-cover.jpg" />
+  <meta name="twitter:image:alt" content="Anaya Bika Point bike shop front on CST Road, Kurla West" />
 
   <link rel="manifest" href="site.webmanifest" />
   <link rel="apple-touch-icon" href="assets/icon.svg" />
-  <meta name="theme-color" content="#0a0a0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Anaya Bika Point" />
   <link
     rel="icon"
@@ -106,8 +109,8 @@
           "description": "Anaya Bika Point is a trusted two wheeler bike shop in Kurla West, Mumbai offering two wheeler spare parts, sales, repair and service on CST Road near Kismat Nagar Masjid.",
           "url": "https://anayabikapoint.in/",
           "telephone": "+91-9324396437",
-          "image": "https://anayabikapoint.in/assets/shopfront.png",
-          "logo": "https://anayabikapoint.in/assets/shopfront.png",
+          "image": "https://anayabikapoint.in/assets/og-cover.jpg",
+          "logo": "https://anayabikapoint.in/assets/icon.svg",
           "priceRange": "₹₹",
           "currenciesAccepted": "INR",
           "paymentAccepted": "Cash, UPI, Card",
@@ -276,8 +279,13 @@
   <div class="ambient" aria-hidden="true">
     <span class="ambient__glow ambient__glow--emerald"></span>
     <span class="ambient__glow ambient__glow--gold"></span>
+    <span class="ambient__glow ambient__glow--warm"></span>
+    <span class="ambient__glow ambient__glow--aqua"></span>
     <span class="ambient__grid"></span>
+    <span class="ambient__noise"></span>
   </div>
+
+  <div class="scroll-progress" aria-hidden="true"></div>
 
   <div class="site-wrap">
     <!-- ================= HEADER ================= -->
@@ -423,18 +431,22 @@
         <div class="container-xl">
           <div class="hero-grid">
             <div class="hero-copy">
-              <span class="eyebrow reveal">
-                <span class="eyebrow-dot" aria-hidden="true"></span>
-                Best 2-Wheeler Shop in Kurla West
+              <span class="hero-badge reveal">
+                <span class="hero-badge__dot" aria-hidden="true"></span>
+                Kurla West's Premier 2-Wheeler Hub
               </span>
 
-              <h1 id="hero-title" class="hero-title reveal" style="--delay: 80ms">
-                Welcome to
-                <span class="text-gold-gradient">Anaya Bika Point</span>
+              <h1 id="hero-title" class="hero-title reveal" style="--delay: 90ms">
+                <span class="hero-title__lead">Welcome to</span>
+                <span class="hero-title__name text-gold-gradient">Anaya Bika Point</span>
+                <span class="hero-title__tail">
+                  Best 2-Wheeler Spare Parts, Sales, Repair & Service
+                </span>
               </h1>
 
-              <p class="hero-sub reveal" style="--delay: 160ms">
-                Kurla West's Most Trusted & Premium 2-Wheeler Hub
+              <p class="hero-sub reveal" style="--delay: 180ms">
+                Kurla West's most trusted & premium 2-wheeler hub — genuine spares,
+                honest pricing and fast service on CST Road, Rupa Nagar.
                 <span class="hero-sub-sep" aria-hidden="true">|</span>
                 Quality, Trust & Fast Service
               </p>
@@ -473,7 +485,7 @@
               </div>
             </div>
 
-            <div class="hero-visual reveal" style="--delay: 200ms">
+            <div class="hero-visual reveal reveal--scale" style="--delay: 200ms">
               <!-- Frame 1 — Shop front -->
               <figure class="frame-card glass shopfront-frame" data-tilt>
                 <span class="frame-glow" aria-hidden="true"></span>
@@ -482,13 +494,13 @@
                   <div class="media-fallback" aria-hidden="true">
                     <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                     <span class="media-fallback-label">Shop front photo</span>
-                    <span class="media-fallback-note">shopfront.png</span>
+                    <span class="media-fallback-note">shopfront.jpeg</span>
                   </div>
                   <img
-                    src="assets/shopfront.png"
+                    src="assets/shopfront.jpeg"
                     alt="Anaya Bika Point two wheeler bike shop front on CST Road, Kurla West, Mumbai"
-                    width="1200"
-                    height="900"
+                    width="415"
+                    height="739"
                     fetchpriority="high"
                     decoding="async"
                     data-fallback
@@ -517,9 +529,9 @@
                     <div class="media-fallback" aria-hidden="true">
                       <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                       <span class="media-fallback-label">Gallery photo 1</span>
-                      <span class="media-fallback-note">image1.png</span>
+                      <span class="media-fallback-note">image1.jpeg</span>
                     </div>
-                    <img src="assets/image1.png" alt="Two wheeler spare parts and accessories at Anaya Bika Point, Kurla West" width="1200" height="750" decoding="async" data-fallback />
+                    <img src="assets/image1.jpeg" alt="Two wheeler spare parts and accessories at Anaya Bika Point, Kurla West" width="740" height="626" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Spare Parts</span>
                       <p>Genuine two wheeler spares</p>
@@ -530,9 +542,9 @@
                     <div class="media-fallback" aria-hidden="true">
                       <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                       <span class="media-fallback-label">Gallery photo 2</span>
-                      <span class="media-fallback-note">image2.png</span>
+                      <span class="media-fallback-note">image2.jpeg</span>
                     </div>
-                    <img src="assets/image2.png" alt="Bike repair and service work in progress at Anaya Bika Point, CST Road Kurla" width="1200" height="750" decoding="async" data-fallback />
+                    <img src="assets/image2.jpeg" alt="Bike repair and service work in progress at Anaya Bika Point, CST Road Kurla" width="717" height="619" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Repair & Service</span>
                       <p>Expert technician work</p>
@@ -543,9 +555,9 @@
                     <div class="media-fallback" aria-hidden="true">
                       <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                       <span class="media-fallback-label">Gallery photo 3</span>
-                      <span class="media-fallback-note">image3.png</span>
+                      <span class="media-fallback-note">image3.jpeg</span>
                     </div>
-                    <img src="assets/image3.png" alt="Two wheeler showroom display at Anaya Bika Point, Kurla West Mumbai" width="1200" height="750" decoding="async" data-fallback />
+                    <img src="assets/image3.jpeg" alt="Two wheeler showroom display at Anaya Bika Point, Kurla West Mumbai" width="647" height="781" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Showroom</span>
                       <p>Bikes and scooters on display</p>
@@ -556,9 +568,9 @@
                     <div class="media-fallback" aria-hidden="true">
                       <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                       <span class="media-fallback-label">Gallery photo 4</span>
-                      <span class="media-fallback-note">image4.png</span>
+                      <span class="media-fallback-note">image4.jpeg</span>
                     </div>
-                    <img src="assets/image4.png" alt="Customer bike being serviced at Anaya Bika Point in Rupa Nagar, Kurla West" width="1200" height="750" decoding="async" data-fallback />
+                    <img src="assets/image4.jpeg" alt="Customer bike being serviced at Anaya Bika Point in Rupa Nagar, Kurla West" width="489" height="857" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">In Service</span>
                       <p>Careful, hygienic handling</p>
@@ -569,9 +581,9 @@
                     <div class="media-fallback" aria-hidden="true">
                       <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                       <span class="media-fallback-label">Gallery photo 5</span>
-                      <span class="media-fallback-note">image5.png</span>
+                      <span class="media-fallback-note">image5.jpeg</span>
                     </div>
-                    <img src="assets/image5.png" alt="Everyday two wheeler essentials and accessories at Anaya Bika Point Kurla West" width="1200" height="750" decoding="async" data-fallback />
+                    <img src="assets/image5.jpeg" alt="Everyday two wheeler essentials and accessories at Anaya Bika Point Kurla West" width="766" height="623" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Accessories</span>
                       <p>Everything your ride needs</p>
@@ -646,7 +658,7 @@
           </div>
 
           <div class="trust-grid">
-            <article class="trust-card glass reveal" style="--delay: 0ms">
+            <article class="trust-card glass reveal" data-spotlight style="--delay: 0ms">
               <span class="icon-tile" aria-hidden="true">
                 <svg class="icon"><use href="#icon-shield" /></svg>
               </span>
@@ -654,7 +666,7 @@
               <p>Genuine parts and dependable service, checked before your two wheeler leaves the shop.</p>
             </article>
 
-            <article class="trust-card glass reveal" style="--delay: 90ms">
+            <article class="trust-card glass reveal" data-spotlight style="--delay: 90ms">
               <span class="icon-tile" aria-hidden="true">
                 <svg class="icon"><use href="#icon-wrench" /></svg>
               </span>
@@ -662,7 +674,7 @@
               <p>Skilled technicians, clean tools and a tidy workspace on every repair and service job.</p>
             </article>
 
-            <article class="trust-card glass reveal" style="--delay: 180ms">
+            <article class="trust-card glass reveal" data-spotlight style="--delay: 180ms">
               <span class="icon-tile" aria-hidden="true">
                 <svg class="icon"><use href="#icon-star" /></svg>
               </span>
@@ -670,7 +682,7 @@
               <p>A trusted 2-wheeler destination in Kurla West, rated highly by riders across Mumbai.</p>
             </article>
 
-            <article class="trust-card glass reveal" style="--delay: 270ms">
+            <article class="trust-card glass reveal" data-spotlight style="--delay: 270ms">
               <span class="icon-tile" aria-hidden="true">
                 <svg class="icon"><use href="#icon-chat" /></svg>
               </span>
@@ -698,7 +710,7 @@
 
           <div class="platform-grid">
             <a
-              class="platform-card platform-card--ig glass reveal"
+              class="platform-card platform-card--ig glass reveal reveal--scale"
               href="https://www.instagram.com/anaya.bike_point_kurla"
               target="_blank"
               rel="noopener noreferrer"
@@ -719,7 +731,7 @@
             </a>
 
             <a
-              class="platform-card platform-card--jd glass reveal"
+              class="platform-card platform-card--jd glass reveal reveal--scale"
               href="https://www.justdial.com/Mumbai/Anaya-Bika-Point-Near-Kismat-Nagar-Masjid-Rupa-Nagar-Kurla-West/022PXX22-XX22-180607190156-U3P8_BZDET"
               target="_blank"
               rel="noopener noreferrer"
