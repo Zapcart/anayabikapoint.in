@@ -16,8 +16,8 @@
   />
   <meta name="author" content="Anaya Bika Point" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
-  <meta name="theme-color" content="#0A0A0B" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#FFFFFF" />
+  <meta name="color-scheme" content="light" />
   <meta name="geo.region" content="IN-MH" />
   <meta name="geo.placename" content="Kurla West, Mumbai" />
   <meta name="geo.position" content="19.0726;72.8812" />
@@ -54,41 +54,20 @@
   <link rel="manifest" href="site.webmanifest" />
   <link rel="apple-touch-icon" href="assets/icon.svg" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Anaya Bika Point" />
   <link
     rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0b'/%3E%3Cpath d='M32 12 18 52h7.2l3-9h11.6l3 9H50L36 12h-4Zm1 9 4.2 14h-8.4L33 21Z' fill='%23d4af37'/%3E%3C/svg%3E"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B63E5'/%3E%3Cpath d='M32 12 18 52h7.2l3-9h11.6l3 9H50L36 12h-4Zm1 9 4.2 14h-8.4L33 21Z' fill='%23FFFFFF'/%3E%3Crect x='43' y='11' width='9' height='9' rx='2.5' fill='%23E63946'/%3E%3C/svg%3E"
   />
 
   <!-- ================= FONTS ================= -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
     rel="stylesheet"
   />
-
-  <!-- Tailwind Play CDN: optional utilities only. All critical styling ships in css/styles.css. -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            ink: '#0A0A0B',
-            gold: '#D4AF37',
-            goldwarm: '#F59E0B',
-            brandemerald: '#10B981'
-          },
-          fontFamily: {
-            sans: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-            display: ['Montserrat', 'Poppins', 'sans-serif']
-          }
-        }
-      }
-    };
-  </script>
 
   <script>
     document.documentElement.classList.replace('no-js', 'js');
@@ -274,18 +253,13 @@
     <symbol id="icon-check" viewBox="0 0 24 24">
       <path d="m5 12.5 4.2 4.2L19 6.5" />
     </symbol>
+    <symbol id="icon-boxes" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7.5" height="7.5" rx="1.8" />
+      <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8" />
+      <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8" />
+      <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8" />
+    </symbol>
   </svg>
-
-  <div class="ambient" aria-hidden="true">
-    <span class="ambient__glow ambient__glow--emerald"></span>
-    <span class="ambient__glow ambient__glow--gold"></span>
-    <span class="ambient__glow ambient__glow--warm"></span>
-    <span class="ambient__glow ambient__glow--aqua"></span>
-    <span class="ambient__grid"></span>
-    <span class="ambient__noise"></span>
-  </div>
-
-  <div class="scroll-progress" aria-hidden="true"></div>
 
   <div class="site-wrap">
     <!-- ================= HEADER ================= -->
@@ -302,20 +276,21 @@
         <nav class="desktop-nav" aria-label="Primary">
           <a class="nav-link is-active" href="#home" aria-current="true">Home</a>
           <a class="nav-link" href="#why">Why Us</a>
+          <a class="nav-link" href="#wholesale">Wholesale</a>
           <a class="nav-link" href="#connect">Connect</a>
           <a class="nav-link" href="#hours">Timings</a>
           <a class="nav-link" href="#visit">Visit Us</a>
         </nav>
 
         <div class="header-actions">
-          <span class="status-badge header-status" data-status-badge aria-live="polite">
+          <span class="status-pill" data-status-badge aria-live="polite">
             <span class="status-dot" aria-hidden="true"></span>
             <span id="statusText">Checking hours…</span>
           </span>
 
           <div class="header-social" aria-label="Social profiles">
             <a
-              class="social-btn social-btn--ig"
+              class="icon-btn icon-btn--ig"
               href="https://www.instagram.com/anaya.bike_point_kurla"
               target="_blank"
               rel="noopener noreferrer"
@@ -324,7 +299,7 @@
               <svg class="icon" aria-hidden="true"><use href="#icon-instagram" /></svg>
             </a>
             <a
-              class="social-btn social-btn--jd"
+              class="icon-btn icon-btn--jd"
               href="https://www.justdial.com/Mumbai/Anaya-Bika-Point-Near-Kismat-Nagar-Masjid-Rupa-Nagar-Kurla-West/022PXX22-XX22-180607190156-U3P8_BZDET"
               target="_blank"
               rel="noopener noreferrer"
@@ -335,7 +310,7 @@
           </div>
 
           <a
-            class="btn-icon header-call"
+            class="icon-btn icon-btn--call"
             href="tel:9324396437"
             aria-label="Call Anaya Bika Point on 9324396437"
           >
@@ -369,7 +344,7 @@
 
       <div id="mobileMenu" class="mobile-menu" data-mobile-menu aria-hidden="true">
         <div class="mobile-menu-inner">
-          <span class="status-badge" data-status-badge>
+          <span class="status-pill status-pill--block" data-status-badge>
             <span class="status-dot" aria-hidden="true"></span>
             <span id="mobileStatusText">Checking hours…</span>
           </span>
@@ -377,6 +352,7 @@
           <nav class="mobile-nav" aria-label="Mobile">
             <a class="mobile-nav-link" href="#home">Home</a>
             <a class="mobile-nav-link" href="#why">Why Us</a>
+            <a class="mobile-nav-link" href="#wholesale">Wholesale</a>
             <a class="mobile-nav-link" href="#connect">Connect</a>
             <a class="mobile-nav-link" href="#hours">Timings</a>
             <a class="mobile-nav-link" href="#visit">Visit Us</a>
@@ -400,7 +376,7 @@
 
           <div class="mobile-social">
             <a
-              class="social-btn social-btn--ig social-btn--wide"
+              class="icon-btn icon-btn--ig icon-btn--wide"
               href="https://www.instagram.com/anaya.bike_point_kurla"
               target="_blank"
               rel="noopener noreferrer"
@@ -409,7 +385,7 @@
               Instagram
             </a>
             <a
-              class="social-btn social-btn--jd social-btn--wide"
+              class="icon-btn icon-btn--jd icon-btn--wide"
               href="https://www.justdial.com/Mumbai/Anaya-Bika-Point-Near-Kismat-Nagar-Masjid-Rupa-Nagar-Kurla-West/022PXX22-XX22-180607190156-U3P8_BZDET"
               target="_blank"
               rel="noopener noreferrer"
@@ -425,42 +401,40 @@
     <main id="main">
       <!-- ================= HERO ================= -->
       <section id="home" class="hero" aria-labelledby="hero-title">
-        <span class="hero-parallax hero-parallax--gold" data-parallax="0.12" aria-hidden="true"></span>
-        <span class="hero-parallax hero-parallax--emerald" data-parallax="-0.08" aria-hidden="true"></span>
+        <span class="hero-pattern" aria-hidden="true"></span>
+        <span class="hero-blob hero-blob--blue" aria-hidden="true"></span>
+        <span class="hero-blob hero-blob--red" aria-hidden="true"></span>
 
         <div class="container-xl">
           <div class="hero-grid">
             <div class="hero-copy">
               <span class="hero-badge reveal">
                 <span class="hero-badge__dot" aria-hidden="true"></span>
-                Kurla West's Premier 2-Wheeler Hub
+                Best 2 Wheeler Bike Shop in Kurla
               </span>
 
-              <h1 id="hero-title" class="hero-title reveal" style="--delay: 90ms">
+              <h1 id="hero-title" class="hero-title reveal" style="--delay: 80ms">
                 <span class="hero-title__lead">Welcome to</span>
-                <span class="hero-title__name text-gold-gradient">Anaya Bika Point</span>
-                <span class="hero-title__tail">
-                  Best 2-Wheeler Spare Parts, Sales, Repair & Service
-                </span>
+                <span class="hero-title__name">Anaya Bika Point</span>
               </h1>
 
-              <p class="hero-sub reveal" style="--delay: 180ms">
-                Kurla West's most trusted & premium 2-wheeler hub — genuine spares,
-                honest pricing and fast service on CST Road, Rupa Nagar.
-                <span class="hero-sub-sep" aria-hidden="true">|</span>
-                Quality, Trust & Fast Service
+              <p class="hero-sub reveal" style="--delay: 150ms">
+                Kurla West's Premier 2-Wheeler Parts & Accessories Hub
               </p>
 
-              <div class="hero-actions reveal" style="--delay: 240ms">
+              <p class="hero-tag reveal" style="--delay: 200ms">
+                <svg class="icon" aria-hidden="true"><use href="#icon-boxes" /></svg>
+                All Spare Parts & Body Panels at Wholesale Rates
+              </p>
+
+              <div class="hero-actions reveal" style="--delay: 250ms">
                 <a
-                  class="btn btn-wa btn-lg"
+                  class="btn btn-wa btn-lg btn-pulse"
                   href="https://wa.me/919324396437?text=Hello%20Anaya%20Bika%20Point,%20I%20want%20to%20inquire%20about%20your%20services."
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span class="wa-pulse" aria-hidden="true">
-                    <svg class="icon icon--solid"><use href="#icon-whatsapp" /></svg>
-                  </span>
+                  <svg class="icon icon--solid" aria-hidden="true"><use href="#icon-whatsapp" /></svg>
                   Chat on WhatsApp
                 </a>
                 <a class="btn btn-call btn-lg" href="tel:9324396437">
@@ -469,8 +443,8 @@
                 </a>
               </div>
 
-              <div class="hero-meta reveal" style="--delay: 320ms">
-                <span class="status-badge status-badge--lg" data-status-badge>
+              <div class="hero-meta reveal" style="--delay: 300ms">
+                <span class="status-pill status-pill--lg" data-status-badge>
                   <span class="status-dot" aria-hidden="true"></span>
                   <span id="heroStatusText">Open Today (10 AM – 9 PM)</span>
                 </span>
@@ -478,19 +452,18 @@
                   <svg class="icon" aria-hidden="true"><use href="#icon-wrench" /></svg>
                   Repair & Service
                 </span>
-                <span class="meta-chip meta-chip--warn">
+                <span class="meta-chip meta-chip--red">
                   <svg class="icon" aria-hidden="true"><use href="#icon-calendar" /></svg>
-                  Friday closed
+                  Closed on Fridays
                 </span>
               </div>
             </div>
 
-            <div class="hero-visual reveal reveal--scale" style="--delay: 200ms">
+            <div class="hero-visual reveal reveal--scale" style="--delay: 180ms">
               <!-- Frame 1 — Shop front -->
-              <figure class="frame-card glass shopfront-frame" data-tilt>
-                <span class="frame-glow" aria-hidden="true"></span>
-                <span class="frame-badge">Frame 01</span>
-                <div class="frame-inner" data-media>
+              <figure class="frame-card shopfront-frame" data-media>
+                <span class="frame-badge">Store Front</span>
+                <div class="frame-inner">
                   <div class="media-fallback" aria-hidden="true">
                     <svg class="icon media-fallback-icon"><use href="#icon-image" /></svg>
                     <span class="media-fallback-label">Shop front photo</span>
@@ -516,14 +489,14 @@
                 </div>
               </figure>
 
-              <!-- Frame 2 — Gallery carousel -->
+              <!-- Frame 2 — Gallery crossfade carousel -->
               <div
-                class="carousel frame-card glass"
+                class="carousel frame-card"
                 data-carousel
                 aria-roledescription="carousel"
                 aria-label="Product and service gallery"
               >
-                <span class="frame-badge">Frame 02</span>
+                <span class="frame-badge frame-badge--blue">Gallery</span>
                 <div class="carousel-stage" data-stage aria-live="off">
                   <div class="carousel-slide is-active" data-slide data-media role="group" aria-roledescription="slide" aria-label="Slide 1 of 5">
                     <div class="media-fallback" aria-hidden="true">
@@ -544,7 +517,7 @@
                       <span class="media-fallback-label">Gallery photo 2</span>
                       <span class="media-fallback-note">image2.jpeg</span>
                     </div>
-                    <img src="assets/image2.jpeg" alt="Bike repair and service work in progress at Anaya Bika Point, CST Road Kurla" width="717" height="619" decoding="async" data-fallback />
+                    <img src="assets/image2.jpeg" alt="Bike repair and service work in progress at Anaya Bika Point, CST Road Kurla" width="717" height="619" loading="lazy" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Repair & Service</span>
                       <p>Expert technician work</p>
@@ -557,7 +530,7 @@
                       <span class="media-fallback-label">Gallery photo 3</span>
                       <span class="media-fallback-note">image3.jpeg</span>
                     </div>
-                    <img src="assets/image3.jpeg" alt="Two wheeler showroom display at Anaya Bika Point, Kurla West Mumbai" width="647" height="781" decoding="async" data-fallback />
+                    <img src="assets/image3.jpeg" alt="Two wheeler showroom display at Anaya Bika Point, Kurla West Mumbai" width="647" height="781" loading="lazy" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Showroom</span>
                       <p>Bikes and scooters on display</p>
@@ -570,7 +543,7 @@
                       <span class="media-fallback-label">Gallery photo 4</span>
                       <span class="media-fallback-note">image4.jpeg</span>
                     </div>
-                    <img src="assets/image4.jpeg" alt="Customer bike being serviced at Anaya Bika Point in Rupa Nagar, Kurla West" width="489" height="857" decoding="async" data-fallback />
+                    <img src="assets/image4.jpeg" alt="Customer bike being serviced at Anaya Bika Point in Rupa Nagar, Kurla West" width="489" height="857" loading="lazy" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">In Service</span>
                       <p>Careful, hygienic handling</p>
@@ -583,7 +556,7 @@
                       <span class="media-fallback-label">Gallery photo 5</span>
                       <span class="media-fallback-note">image5.jpeg</span>
                     </div>
-                    <img src="assets/image5.jpeg" alt="Everyday two wheeler essentials and accessories at Anaya Bika Point Kurla West" width="766" height="623" decoding="async" data-fallback />
+                    <img src="assets/image5.jpeg" alt="Everyday two wheeler essentials and accessories at Anaya Bika Point Kurla West" width="766" height="623" loading="lazy" decoding="async" data-fallback />
                     <div class="slide-caption">
                       <span class="slide-tag">Accessories</span>
                       <p>Everything your ride needs</p>
@@ -620,22 +593,22 @@
         </div>
       </section>
 
-      <!-- ================= HIGHLIGHT STRIP ================= -->
+      <!-- ================= ASSURANCE BAR ================= -->
       <div class="container-xl">
-        <div class="highlight-strip reveal" style="--delay: 120ms" aria-label="Store highlights">
-          <span class="highlight-item">
+        <div class="assurance-bar reveal" aria-label="Store highlights">
+          <span class="assurance-item">
             <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
             100% Quality Parts
           </span>
-          <span class="highlight-item">
+          <span class="assurance-item">
             <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
             Expert Technicians
           </span>
-          <span class="highlight-item">
+          <span class="assurance-item">
             <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
             Top Rated in Kurla
           </span>
-          <span class="highlight-item">
+          <span class="assurance-item">
             <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
             Fast Response
           </span>
@@ -643,13 +616,13 @@
       </div>
 
       <!-- ================= TRUST ================= -->
-      <section id="why" class="section" aria-labelledby="why-title">
+      <section id="why" class="section section--tint" aria-labelledby="why-title">
         <div class="container-xl">
           <div class="section-head reveal">
             <span class="section-kicker">Why Anaya Bika Point</span>
             <h2 id="why-title" class="section-title">
               Premium standards,
-              <span class="text-gold-gradient">neighbourhood trust</span>
+              <span class="text-blue">neighbourhood trust</span>
             </h2>
             <p class="section-sub">
               The best bike shop in Kurla West for two wheeler spare parts, sales, repair and
@@ -658,32 +631,32 @@
           </div>
 
           <div class="trust-grid">
-            <article class="trust-card glass reveal" data-spotlight style="--delay: 0ms">
-              <span class="icon-tile" aria-hidden="true">
+            <article class="card trust-card reveal" style="--delay: 0ms">
+              <span class="icon-tile icon-tile--blue" aria-hidden="true">
                 <svg class="icon"><use href="#icon-shield" /></svg>
               </span>
               <h3>100% Quality Assured</h3>
               <p>Genuine parts and dependable service, checked before your two wheeler leaves the shop.</p>
             </article>
 
-            <article class="trust-card glass reveal" data-spotlight style="--delay: 90ms">
-              <span class="icon-tile" aria-hidden="true">
+            <article class="card trust-card reveal" style="--delay: 80ms">
+              <span class="icon-tile icon-tile--red" aria-hidden="true">
                 <svg class="icon"><use href="#icon-wrench" /></svg>
               </span>
               <h3>Hygienic & Expert Work</h3>
               <p>Skilled technicians, clean tools and a tidy workspace on every repair and service job.</p>
             </article>
 
-            <article class="trust-card glass reveal" data-spotlight style="--delay: 180ms">
-              <span class="icon-tile" aria-hidden="true">
+            <article class="card trust-card reveal" style="--delay: 160ms">
+              <span class="icon-tile icon-tile--blue" aria-hidden="true">
                 <svg class="icon"><use href="#icon-star" /></svg>
               </span>
               <h3>Top Rated Local Hub</h3>
               <p>A trusted 2-wheeler destination in Kurla West, rated highly by riders across Mumbai.</p>
             </article>
 
-            <article class="trust-card glass reveal" data-spotlight style="--delay: 270ms">
-              <span class="icon-tile" aria-hidden="true">
+            <article class="card trust-card reveal" style="--delay: 240ms">
+              <span class="icon-tile icon-tile--red" aria-hidden="true">
                 <svg class="icon"><use href="#icon-chat" /></svg>
               </span>
               <h3>Instant Assistance</h3>
@@ -693,14 +666,66 @@
         </div>
       </section>
 
+      <!-- ================= WHOLESALE BANNER ================= -->
+      <section id="wholesale" class="section section--flush" aria-labelledby="wholesale-title">
+        <div class="container-xl">
+          <div class="wholesale-banner reveal">
+            <div class="wholesale-copy">
+              <span class="wholesale-kicker">Wholesale Counter</span>
+              <h2 id="wholesale-title" class="wholesale-title">
+                All Bike Spare Parts & Body Panels Available at Wholesale Rates
+              </h2>
+              <p class="wholesale-text">
+                Garages, resellers and walk-in riders — get genuine panels, levers, cables,
+                lighting and consumables priced for volume.
+              </p>
+              <ul class="wholesale-list">
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
+                  Body panels, fairings & side covers
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
+                  Cables, levers, mirrors & lighting
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="#icon-check" /></svg>
+                  Bulk supply for garages & resellers
+                </li>
+              </ul>
+            </div>
+
+            <div class="wholesale-side">
+              <span class="wholesale-price">
+                <span class="wholesale-price__label">Price tag</span>
+                Wholesale Rates
+              </span>
+              <a
+                class="btn btn-wa btn-block"
+                href="https://wa.me/919324396437?text=Hello%20Anaya%20Bika%20Point,%20I%20need%20a%20wholesale%20quote%20for%20bike%20spare%20parts."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg class="icon icon--solid" aria-hidden="true"><use href="#icon-whatsapp" /></svg>
+                Get Wholesale Quote
+              </a>
+              <a class="btn btn-light btn-block" href="tel:9324396437">
+                <svg class="icon" aria-hidden="true"><use href="#icon-phone" /></svg>
+                Call 9324396437
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= SOCIAL PLATFORMS ================= -->
-      <section id="connect" class="section section--tight" aria-labelledby="connect-title">
+      <section id="connect" class="section" aria-labelledby="connect-title">
         <div class="container-xl">
           <div class="section-head reveal">
             <span class="section-kicker">Find us online</span>
             <h2 id="connect-title" class="section-title">
               Verified profiles,
-              <span class="text-gold-gradient">real reviews</span>
+              <span class="text-blue">real reviews</span>
             </h2>
             <p class="section-sub">
               Follow our latest arrivals and service updates on Instagram, or check our verified
@@ -710,13 +735,13 @@
 
           <div class="platform-grid">
             <a
-              class="platform-card platform-card--ig glass reveal reveal--scale"
+              class="card platform-card reveal reveal--scale"
               href="https://www.instagram.com/anaya.bike_point_kurla"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow Anaya Bika Point on Instagram (opens in a new tab)"
             >
-              <span class="platform-icon" aria-hidden="true">
+              <span class="platform-icon platform-icon--ig" aria-hidden="true">
                 <svg class="icon"><use href="#icon-instagram" /></svg>
               </span>
               <span class="platform-body">
@@ -731,14 +756,14 @@
             </a>
 
             <a
-              class="platform-card platform-card--jd glass reveal reveal--scale"
+              class="card platform-card reveal reveal--scale"
               href="https://www.justdial.com/Mumbai/Anaya-Bika-Point-Near-Kismat-Nagar-Masjid-Rupa-Nagar-Kurla-West/022PXX22-XX22-180607190156-U3P8_BZDET"
               target="_blank"
               rel="noopener noreferrer"
-              style="--delay: 110ms"
+              style="--delay: 100ms"
               aria-label="View the verified Justdial profile of Anaya Bika Point (opens in a new tab)"
             >
-              <span class="platform-icon" aria-hidden="true">
+              <span class="platform-icon platform-icon--jd" aria-hidden="true">
                 <svg class="icon"><use href="#icon-badge-check" /></svg>
               </span>
               <span class="platform-body">
@@ -756,14 +781,14 @@
       </section>
 
       <!-- ================= HOURS ================= -->
-      <section id="hours" class="section" aria-labelledby="hours-title">
+      <section id="hours" class="section section--tint" aria-labelledby="hours-title">
         <div class="container-xl">
           <div class="hours-grid">
-            <div class="info-card glass reveal">
+            <div class="card info-card reveal">
               <span class="section-kicker">Store information</span>
               <h2 id="hours-title" class="section-title">
                 Open to serve,
-                <span class="text-gold-gradient">six days a week</span>
+                <span class="text-blue">six days a week</span>
               </h2>
               <p class="section-sub">
                 Plan your visit around our regular hours. We are closed every Friday for our
@@ -772,7 +797,7 @@
 
               <div class="info-list">
                 <div class="info-row">
-                  <span class="icon-tile" aria-hidden="true">
+                  <span class="icon-tile icon-tile--blue" aria-hidden="true">
                     <svg class="icon"><use href="#icon-clock" /></svg>
                   </span>
                   <div>
@@ -782,20 +807,20 @@
                 </div>
 
                 <div class="info-row">
-                  <span class="icon-tile" aria-hidden="true">
+                  <span class="icon-tile icon-tile--red" aria-hidden="true">
                     <svg class="icon"><use href="#icon-calendar" /></svg>
                   </span>
                   <div>
                     <span class="info-label">Weekly off</span>
                     <span class="info-value">
                       Friday
-                      <span class="closed-badge">FRIDAY CLOSED</span>
+                      <span class="badge-red">FRIDAY CLOSED</span>
                     </span>
                   </div>
                 </div>
 
                 <div class="info-row">
-                  <span class="icon-tile" aria-hidden="true">
+                  <span class="icon-tile icon-tile--blue" aria-hidden="true">
                     <svg class="icon"><use href="#icon-phone" /></svg>
                   </span>
                   <div>
@@ -808,12 +833,12 @@
               </div>
             </div>
 
-            <div class="hours-panel glass reveal" data-hours-panel style="--delay: 120ms">
-              <span class="status-orb" aria-hidden="true">
+            <div class="card hours-panel reveal" data-hours-panel style="--delay: 100ms">
+              <span class="hours-panel__icon" aria-hidden="true">
                 <svg class="icon"><use href="#icon-clock" /></svg>
               </span>
 
-              <span class="status-badge" data-status-badge>
+              <span class="status-pill status-pill--lg" data-status-badge>
                 <span class="status-dot" aria-hidden="true"></span>
                 <span id="hoursStatusText">Open Today (10 AM – 9 PM)</span>
               </span>
@@ -828,7 +853,7 @@
                 please call ahead.
               </p>
 
-              <a class="btn btn-ghost btn-block" href="tel:9324396437">
+              <a class="btn btn-outline btn-block" href="tel:9324396437">
                 <svg class="icon" aria-hidden="true"><use href="#icon-phone" /></svg>
                 Call before visiting
               </a>
@@ -844,7 +869,7 @@
             <span class="section-kicker">Find the store</span>
             <h2 id="visit-title" class="section-title">
               Easy to reach,
-              <span class="text-gold-gradient">right in Kurla West</span>
+              <span class="text-blue">right in Kurla West</span>
             </h2>
             <p class="section-sub">
               Located on CST Road in Rupa Nagar, near Kismat Nagar Masjid. Use the directions
@@ -853,8 +878,8 @@
           </div>
 
           <div class="visit-grid">
-            <div class="address-card glass reveal">
-              <span class="icon-tile" aria-hidden="true">
+            <div class="card address-card reveal">
+              <span class="icon-tile icon-tile--blue" aria-hidden="true">
                 <svg class="icon"><use href="#icon-pin" /></svg>
               </span>
               <h3>Anaya Bika Point</h3>
@@ -867,7 +892,7 @@
 
               <div class="address-actions">
                 <a
-                  class="btn btn-call"
+                  class="btn btn-primary"
                   href="https://www.google.com/maps/search/?api=1&query=CST%20Road%20Kurla%20West%20Mumbai"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -875,7 +900,7 @@
                   <svg class="icon" aria-hidden="true"><use href="#icon-pin" /></svg>
                   Get Directions
                 </a>
-                <a class="btn btn-ghost" href="tel:9324396437">
+                <a class="btn btn-outline" href="tel:9324396437">
                   <svg class="icon" aria-hidden="true"><use href="#icon-phone" /></svg>
                   Call Store
                 </a>
@@ -886,7 +911,7 @@
               </p>
             </div>
 
-            <div class="map-card glass reveal" style="--delay: 120ms">
+            <div class="card map-card reveal" style="--delay: 100ms">
               <iframe
                 src="https://www.google.com/maps?q=CST%20Road%2C%20Rupa%20Nagar%2C%20Kurla%20West%2C%20Mumbai%20400070&z=16&output=embed"
                 title="Map showing Anaya Bika Point on CST Road, Kurla West"
@@ -928,7 +953,7 @@
 
             <div class="footer-social">
               <a
-                class="social-btn social-btn--ig"
+                class="icon-btn icon-btn--ig"
                 href="https://www.instagram.com/anaya.bike_point_kurla"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -937,7 +962,7 @@
                 <svg class="icon" aria-hidden="true"><use href="#icon-instagram" /></svg>
               </a>
               <a
-                class="social-btn social-btn--jd"
+                class="icon-btn icon-btn--jd"
                 href="https://www.justdial.com/Mumbai/Anaya-Bika-Point-Near-Kismat-Nagar-Masjid-Rupa-Nagar-Kurla-West/022PXX22-XX22-180607190156-U3P8_BZDET"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -946,7 +971,7 @@
                 <svg class="icon" aria-hidden="true"><use href="#icon-badge-check" /></svg>
               </a>
               <a
-                class="social-btn social-btn--wa"
+                class="icon-btn icon-btn--wa"
                 href="https://wa.me/919324396437?text=Hello%20Anaya%20Bika%20Point,%20I%20want%20to%20inquire%20about%20your%20services."
                 target="_blank"
                 rel="noopener noreferrer"
@@ -961,6 +986,7 @@
             <h3 class="footer-title">Quick Links</h3>
             <a class="footer-link" href="#home">Home</a>
             <a class="footer-link" href="#why">Why Us</a>
+            <a class="footer-link" href="#wholesale">Wholesale</a>
             <a class="footer-link" href="#connect">Connect</a>
             <a class="footer-link" href="#hours">Timings</a>
             <a class="footer-link" href="#visit">Visit Us</a>
@@ -987,9 +1013,9 @@
             <p class="footer-text">Monday – Sunday<br />10:00 AM – 9:00 PM</p>
             <p class="footer-text footer-text--warn">
               Friday
-              <span class="closed-badge">CLOSED</span>
+              <span class="badge-red">CLOSED</span>
             </p>
-            <a class="footer-link footer-link--gold" href="tel:9324396437">Call before visiting</a>
+            <a class="footer-link footer-link--accent" href="tel:9324396437">Call before visiting</a>
           </div>
         </div>
 
@@ -1016,13 +1042,13 @@
       <span class="sr-only">Open Instagram profile</span>
       <span class="float-tip" aria-hidden="true">Instagram</span>
     </a>
-    <a class="float-btn float-call" href="tel:9324396437">
+    <a class="float-btn float-btn--call" href="tel:9324396437">
       <svg class="icon" aria-hidden="true"><use href="#icon-phone" /></svg>
       <span class="sr-only">Call Anaya Bika Point</span>
       <span class="float-tip" aria-hidden="true">Call now</span>
     </a>
     <a
-      class="float-btn float-wa"
+      class="float-btn float-btn--wa"
       href="https://wa.me/919324396437?text=Hello%20Anaya%20Bika%20Point,%20I%20want%20to%20inquire%20about%20your%20services."
       target="_blank"
       rel="noopener noreferrer"

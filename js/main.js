@@ -1,21 +1,18 @@
 /* ==========================================================================
    Anaya Bika Point — interaction layer
-   Vanilla JS, zero dependencies. Every block is defensive: a failure in one
-   feature must never break the rest of the page.
+   Vanilla JS, zero dependencies, zero scroll listeners, zero RAF loops.
 
-   Modules
+   All motion is CSS-driven (transitions + keyframes). JavaScript only:
      1. Live open / closed status (IST)
-     2. Hero carousel
+     2. Hero gallery carousel (CSS crossfade)
      3. Mobile menu
-     4. Fluid scroll dampening (custom RAF lerp, Lenis-style, opt-in)
-     5. Scroll-linked visuals (progress bar, --sy, header state)
-     6. Scroll reveal (IntersectionObserver, staggered)
-     7. Active navigation
-     8. Image fallbacks (drop-in friendly)
-     9. Pointer tilt on the shop-front frame
-    10. Pointer bloom (--mx / --my) + trust-card spotlight (--cx / --cy)
-    11. Hero parallax layers
-    12. Footer year
+     4. Scroll reveal (IntersectionObserver)
+     5. Active navigation (IntersectionObserver)
+     6. Header elevation state (IntersectionObserver sentinel)
+     7. Image fallbacks (drop-in friendly)
+     8. Footer year
+
+   Every module is defensive: missing DOM nodes are a no-op, never an error.
    ========================================================================== */
 (function () {
   "use strict";
@@ -29,11 +26,7 @@
   var CLOSED_WEEKDAY = "Fri";
   var HOURS_LABEL = "10:00 AM - 9:00 PM";
   var CAROUSEL_DELAY = 5200;
-
-  /* Smooth scrolling tuning (higher = snappier, lower = more glide). */
-  var SCROLL_EASE = 0.16;
-  var SCROLL_EPSILON = 0.6;
-  var SMOOTH_MIN_WIDTH = 1024;
+  var NAV_BREAKPOINT = 1120; // must match the CSS breakpoint that hides .nav
 
   var reduceMotion = false;
   try {
@@ -43,7 +36,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     Small helpers
+     Helpers
      ---------------------------------------------------------------------- */
   function logError(scope, err) {
     // Descriptive, non-fatal logging to simplify debugging.
@@ -52,35 +45,12 @@
     }
   }
 
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
+  function toArray(nodeList) {
+    return Array.prototype.slice.call(nodeList || []);
   }
 
-  function lerp(from, to, amount) {
-    return from + (to - from) * amount;
-  }
-
-  function isFinePointer() {
-    try {
-      return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  function scrollTopNow() {
-    return window.pageYOffset || document.documentElement.scrollTop || 0;
-  }
-
-  function maxScroll() {
-    var doc = document.documentElement;
-    var body = document.body;
-    var height = Math.max(
-      doc ? doc.scrollHeight : 0,
-      body ? body.scrollHeight : 0,
-      body ? body.offsetHeight : 0
-    );
-    return Math.max(0, height - window.innerHeight);
+  function supportsObserver() {
+    return "IntersectionObserver" in window;
   }
 
   /* ------------------------------------------------------------------------
@@ -116,9 +86,8 @@
 
   function resolveStatus() {
     var storeTime = getStoreTime();
-    var isClosedDay = storeTime.weekday === CLOSED_WEEKDAY;
 
-    if (isClosedDay) {
+    if (storeTime.weekday === CLOSED_WEEKDAY) {
       return {
         state: "closed",
         badge: "Closed on Fridays",
@@ -130,8 +99,8 @@
     if (storeTime.minutes >= OPEN_MINUTES && storeTime.minutes < CLOSE_MINUTES) {
       return {
         state: "open",
-        badge: "Open Today (10 AM - 9 PM)",
-        short: "Open Today (10 AM - 9 PM)",
+        badge: "Open Today \u00b7 10 AM - 9 PM",
+        short: "Open Today \u00b7 10 AM - 9 PM",
         detail: "Open now \u00b7 " + HOURS_LABEL + " (IST)"
       };
     }
@@ -157,14 +126,24 @@
   }
 
   function initStatus() {
-    var badges = document.querySelectorAll("[data-status-badge]");
-    var textTargets = {
+    var badges = toArray(document.querySelectorAll("[data-status-badge]"));
+    var targets = {
       statusText: document.getElementById("statusText"),
       mobileStatusText: document.getElementById("mobileStatusText"),
       heroStatusText: document.getElementById("heroStatusText"),
       hoursStatusText: document.getElementById("hoursStatusText"),
       hoursDetail: document.getElementById("hoursDetail")
     };
+
+    var hasTargets =
+      badges.length > 0 ||
+      targets.statusText ||
+      targets.mobileStatusText ||
+      targets.heroStatusText ||
+      targets.hoursStatusText ||
+      targets.hoursDetail;
+
+    if (!hasTargets) return;
 
     function render() {
       var status;
@@ -175,36 +154,38 @@
         return;
       }
 
+      var isOpen = status.state === "open";
+
       for (var b = 0; b < badges.length; b += 1) {
         var badge = badges[b];
-        badge.classList.toggle("is-open", status.state === "open");
-        badge.classList.toggle("is-closed", status.state === "closed");
+        badge.classList.toggle("is-open", isOpen);
+        badge.classList.toggle("is-closed", !isOpen);
         badge.setAttribute("data-state", status.state);
       }
 
-      if (textTargets.statusText) textTargets.statusText.textContent = status.badge;
-      if (textTargets.mobileStatusText) textTargets.mobileStatusText.textContent = status.badge;
-      if (textTargets.hoursStatusText) textTargets.hoursStatusText.textContent = status.badge;
-      if (textTargets.heroStatusText) textTargets.heroStatusText.textContent = status.short;
-      if (textTargets.hoursDetail) textTargets.hoursDetail.textContent = status.detail;
+      if (targets.statusText) targets.statusText.textContent = status.badge;
+      if (targets.mobileStatusText) targets.mobileStatusText.textContent = status.badge;
+      if (targets.hoursStatusText) targets.hoursStatusText.textContent = status.badge;
+      if (targets.heroStatusText) targets.heroStatusText.textContent = status.short;
+      if (targets.hoursDetail) targets.hoursDetail.textContent = status.detail;
     }
 
     render();
-    // Keep the badge honest while the tab stays open.
+    // Keep the pill honest while the tab stays open.
     window.setInterval(function () {
       if (!document.hidden) render();
     }, 60000);
   }
 
   /* ------------------------------------------------------------------------
-     2. Hero carousel
+     2. Hero gallery carousel (CSS handles the crossfade)
      ---------------------------------------------------------------------- */
   function initCarousel() {
     var root = document.querySelector("[data-carousel]");
     if (!root) return;
 
     var stage = root.querySelector("[data-stage]");
-    var slides = Array.prototype.slice.call(root.querySelectorAll("[data-slide]"));
+    var slides = toArray(root.querySelectorAll("[data-slide]"));
     var dotsWrap = root.querySelector("[data-dots]");
     var prevBtn = root.querySelector("[data-prev]");
     var nextBtn = root.querySelector("[data-next]");
@@ -213,62 +194,61 @@
 
     if (!stage || slides.length === 0) return;
 
-    var index = Math.max(
-      0,
-      slides.findIndex(function (slide) {
-        return slide.classList.contains("is-active");
-      })
-    );
+    var index = 0;
+    for (var s = 0; s < slides.length; s += 1) {
+      if (slides[s].classList.contains("is-active")) {
+        index = s;
+        break;
+      }
+    }
+
     var timer = null;
-    var paused = false;
+    var hovered = false;
     var userPaused = false;
     var visible = true;
     var dots = [];
 
     function pad(value) {
-      return String(value).padStart(2, "0");
+      return value < 10 ? "0" + value : String(value);
     }
 
     function buildDots() {
       if (!dotsWrap) return;
       dotsWrap.innerHTML = "";
       dots = [];
-      slides.forEach(function (slide, i) {
+      for (var i = 0; i < slides.length; i += 1) {
         var dot = document.createElement("button");
         dot.type = "button";
         dot.className = "carousel-dot";
         dot.setAttribute("aria-label", "Go to slide " + (i + 1) + " of " + slides.length);
-        dot.addEventListener("click", function () {
-          goTo(i, true);
-        });
+        (function (target) {
+          dot.addEventListener("click", function () {
+            goTo(target, true);
+          });
+        })(i);
         dotsWrap.appendChild(dot);
         dots.push(dot);
-      });
+      }
     }
 
     function syncUi() {
-      slides.forEach(function (slide, i) {
+      for (var i = 0; i < slides.length; i += 1) {
         var isActive = i === index;
-        slide.classList.toggle("is-active", isActive);
-        slide.setAttribute("aria-hidden", isActive ? "false" : "true");
-      });
-      dots.forEach(function (dot, i) {
-        var isActive = i === index;
-        dot.classList.toggle("is-active", isActive);
-        dot.setAttribute("aria-current", isActive ? "true" : "false");
-      });
+        slides[i].classList.toggle("is-active", isActive);
+        slides[i].setAttribute("aria-hidden", isActive ? "false" : "true");
+      }
+      for (var d = 0; d < dots.length; d += 1) {
+        var activeDot = d === index;
+        dots[d].classList.toggle("is-active", activeDot);
+        dots[d].setAttribute("aria-current", activeDot ? "true" : "false");
+      }
       if (counter) counter.textContent = pad(index + 1);
     }
 
     function goTo(nextIndex, fromUser) {
-      if (!slides.length) return;
       index = ((nextIndex % slides.length) + slides.length) % slides.length;
       syncUi();
-      if (fromUser) restartTimer();
-    }
-
-    function next() {
-      goTo(index + 1, false);
+      if (fromUser) startTimer();
     }
 
     function stopTimer() {
@@ -280,19 +260,17 @@
 
     function startTimer() {
       stopTimer();
-      if (userPaused || reduceMotion || !visible || document.hidden) return;
-      timer = window.setInterval(next, CAROUSEL_DELAY);
-    }
-
-    function restartTimer() {
-      startTimer();
+      if (userPaused || reduceMotion || !visible || hovered || document.hidden) return;
+      timer = window.setInterval(function () {
+        goTo(index + 1, false);
+      }, CAROUSEL_DELAY);
     }
 
     function setToggleUi() {
       if (!toggleBtn) return;
-      var playing = !userPaused;
-      toggleBtn.setAttribute("aria-pressed", playing ? "false" : "true");
-      toggleBtn.setAttribute("aria-label", playing ? "Pause slideshow" : "Play slideshow");
+      var paused = userPaused;
+      toggleBtn.setAttribute("aria-pressed", paused ? "true" : "false");
+      toggleBtn.setAttribute("aria-label", paused ? "Play slideshow" : "Pause slideshow");
     }
 
     buildDots();
@@ -309,7 +287,6 @@
         goTo(index + 1, true);
       });
     }
-
     if (toggleBtn) {
       toggleBtn.addEventListener("click", function () {
         userPaused = !userPaused;
@@ -322,20 +299,18 @@
       });
     }
 
-    // Pause while hovered or focused; resume politely afterwards.
+    // Pause while the pointer is over the gallery; resume politely after.
     root.addEventListener("mouseenter", function () {
-      paused = true;
+      hovered = true;
       stopTimer();
     });
     root.addEventListener("mouseleave", function () {
-      paused = false;
+      hovered = false;
       startTimer();
     });
-    root.addEventListener("focusin", function () {
-      stopTimer();
-    });
-    root.addEventListener("focusout", function () {
-      if (!paused) startTimer();
+    root.addEventListener("focusin", stopTimer);
+    root.addEventListener("focusout", function (event) {
+      if (!root.contains(event.relatedTarget)) startTimer();
     });
 
     // Keyboard support when focus is inside the carousel.
@@ -349,9 +324,10 @@
       }
     });
 
-    // Swipe support.
+    // Swipe support (touch only, passive).
     var startX = null;
     var startY = null;
+
     stage.addEventListener(
       "touchstart",
       function (event) {
@@ -361,6 +337,7 @@
       },
       { passive: true }
     );
+
     stage.addEventListener(
       "touchend",
       function (event) {
@@ -375,19 +352,19 @@
       { passive: true }
     );
 
-    // Pause when the carousel scrolls out of view.
-    if ("IntersectionObserver" in window) {
+    // Only run the timer while the gallery is on screen.
+    if (supportsObserver()) {
       try {
         var observer = new IntersectionObserver(
           function (entries) {
-            entries.forEach(function (entry) {
-              visible = entry.isIntersecting;
-              if (visible) {
-                startTimer();
-              } else {
-                stopTimer();
-              }
-            });
+            for (var i = 0; i < entries.length; i += 1) {
+              visible = entries[i].isIntersecting;
+            }
+            if (visible) {
+              startTimer();
+            } else {
+              stopTimer();
+            }
           },
           { threshold: 0.15 }
         );
@@ -416,6 +393,10 @@
     var panel = document.querySelector("[data-mobile-menu]");
     if (!toggle || !panel) return;
 
+    function isOpen() {
+      return toggle.getAttribute("aria-expanded") === "true";
+    }
+
     function setOpen(open) {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
@@ -424,8 +405,10 @@
       document.body.classList.toggle("is-locked", open);
     }
 
+    setOpen(false);
+
     toggle.addEventListener("click", function () {
-      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+      setOpen(!isOpen());
     });
 
     panel.addEventListener("click", function (event) {
@@ -436,14 +419,14 @@
     });
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      if (event.key === "Escape" && isOpen()) {
         setOpen(false);
         toggle.focus();
       }
     });
 
     document.addEventListener("click", function (event) {
-      if (toggle.getAttribute("aria-expanded") !== "true") return;
+      if (!isOpen()) return;
       var target = event.target;
       if (!target) return;
       if (panel.contains(target) || toggle.contains(target)) return;
@@ -451,203 +434,36 @@
     });
 
     window.addEventListener("resize", function () {
-      if (window.innerWidth > 1000) setOpen(false);
+      if (window.innerWidth > NAV_BREAKPOINT) setOpen(false);
     });
   }
 
   /* ------------------------------------------------------------------------
-     4. Fluid scroll dampening
-     A Lenis-style wheel lerp: wheel deltas are accumulated into a target
-     offset and the window is eased toward it on requestAnimationFrame.
-     Disabled for reduced motion, touch devices, and narrow viewports —
-     never hijack a scroll we cannot reproduce faithfully.
-     ---------------------------------------------------------------------- */
-  function initSmoothScroll() {
-    if (reduceMotion) return;
-    if (!isFinePointer()) return;
-    if (window.innerWidth < SMOOTH_MIN_WIDTH) return;
-
-    var target = scrollTopNow();
-    var current = target;
-    var running = false;
-    var frameId = null;
-    var lastApplied = 0;
-
-    function apply(position) {
-      lastApplied = Date.now();
-      try {
-        window.scrollTo({ top: position, left: 0, behavior: "instant" });
-      } catch (err) {
-        window.scrollTo(0, position);
-      }
-    }
-
-    function stop() {
-      running = false;
-      if (frameId !== null) {
-        window.cancelAnimationFrame(frameId);
-        frameId = null;
-      }
-    }
-
-    function tick() {
-      frameId = null;
-      if (!running) return;
-
-      current = scrollTopNow();
-      var distance = target - current;
-
-      if (Math.abs(distance) <= SCROLL_EPSILON) {
-        current = target;
-        apply(target);
-        running = false;
-        return;
-      }
-
-      var nextTop = current + distance * SCROLL_EASE;
-      // Snap within a pixel so the loop always terminates.
-      if (Math.abs(target - nextTop) < SCROLL_EPSILON) nextTop = target;
-      apply(nextTop);
-
-      frameId = window.requestAnimationFrame(tick);
-    }
-
-    function start() {
-      if (running) return;
-      running = true;
-      if (frameId === null) {
-        frameId = window.requestAnimationFrame(tick);
-      }
-    }
-
-    function normalizeDelta(event) {
-      var delta = event.deltaY;
-      if (event.deltaMode === 1) {
-        // Lines.
-        delta *= 16;
-      } else if (event.deltaMode === 2) {
-        // Pages.
-        delta *= window.innerHeight;
-      }
-      // Guard against runaway trackpad spikes.
-      return clamp(delta, -240, 240);
-    }
-
-    function onWheel(event) {
-      if (event.ctrlKey || event.defaultPrevented) return;
-      if (document.body.classList.contains("is-locked")) return;
-      if (event.target && event.target.closest && event.target.closest("[data-native-scroll]")) return;
-
-      var limit = maxScroll();
-      if (limit <= 0) return;
-
-      // Re-sync when the page moved outside of our loop (scrollbar, keyboard).
-      if (!running) {
-        current = scrollTopNow();
-        target = current;
-      }
-
-      var delta = normalizeDelta(event);
-      if (!delta) return;
-
-      var nextTarget = clamp(target + delta, 0, limit);
-      if (nextTarget === target) return;
-
-      event.preventDefault();
-      target = nextTarget;
-      start();
-    }
-
-    // Any scroll we did not produce means the user took over: re-sync.
-    function onNativeScroll() {
-      if (Date.now() - lastApplied < 140) return;
-      current = scrollTopNow();
-      target = current;
-      stop();
-    }
-
-    function onResize() {
-      if (window.innerWidth < SMOOTH_MIN_WIDTH) {
-        stop();
-      }
-      target = clamp(target, 0, maxScroll());
-    }
-
-    try {
-      window.addEventListener("wheel", onWheel, { passive: false });
-      window.addEventListener("scroll", onNativeScroll, { passive: true });
-      window.addEventListener("resize", onResize, { passive: true });
-    } catch (err) {
-      logError("smooth scroll listeners", err);
-    }
-
-    // Keep the frame loop honest if the tab was backgrounded mid-glide.
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) {
-        stop();
-        current = scrollTopNow();
-        target = current;
-      }
-    });
-  }
-
-  /* ------------------------------------------------------------------------
-     5. Scroll-linked visuals: progress bar, ambient drift, header state
-     ---------------------------------------------------------------------- */
-  function initScrollVisuals() {
-    var root = document.documentElement;
-    var header = document.getElementById("siteHeader");
-    var frame = null;
-
-    function paint() {
-      frame = null;
-
-      var scrollY = scrollTopNow();
-      var limit = maxScroll();
-      var progress = limit > 0 ? clamp(scrollY / limit, 0, 1) : 0;
-
-      // Unitless scroll distance consumed by calc() in the ambient layer.
-      root.style.setProperty("--sy", scrollY.toFixed(2));
-      root.style.setProperty("--progress", progress.toFixed(4));
-
-      if (header) {
-        header.classList.toggle("is-scrolled", scrollY > 14);
-      }
-    }
-
-    function schedule() {
-      if (frame !== null) return;
-      frame = window.requestAnimationFrame(paint);
-    }
-
-    paint();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
-    window.addEventListener("load", schedule);
-  }
-
-  /* ------------------------------------------------------------------------
-     6. Scroll reveal
+     4. Scroll reveal (IntersectionObserver, staggered via --delay)
      ---------------------------------------------------------------------- */
   function initReveal() {
-    var items = document.querySelectorAll(".reveal");
+    var items = toArray(document.querySelectorAll(".reveal"));
     if (!items.length) return;
 
-    if (!("IntersectionObserver" in window) || reduceMotion) {
+    function showAll() {
       for (var i = 0; i < items.length; i += 1) {
         items[i].classList.add("is-visible");
       }
+    }
+
+    if (!supportsObserver() || reduceMotion) {
+      showAll();
       return;
     }
 
     try {
       var observer = new IntersectionObserver(
         function (entries, obs) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            obs.unobserve(entry.target);
-          });
+          for (var i = 0; i < entries.length; i += 1) {
+            if (!entries[i].isIntersecting) continue;
+            entries[i].target.classList.add("is-visible");
+            obs.unobserve(entries[i].target);
+          }
         },
         { rootMargin: "0px 0px -10% 0px", threshold: 0.08 }
       );
@@ -655,74 +471,96 @@
       for (var j = 0; j < items.length; j += 1) {
         observer.observe(items[j]);
       }
-
-      // Anything already painted above the fold should not wait for a scroll.
-      window.requestAnimationFrame(function () {
-        for (var k = 0; k < items.length; k += 1) {
-          var rect = items[k].getBoundingClientRect();
-          if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
-            items[k].classList.add("is-visible");
-          }
-        }
-      });
     } catch (err) {
       logError("scroll reveal", err);
-      for (var m = 0; m < items.length; m += 1) {
-        items[m].classList.add("is-visible");
-      }
+      showAll();
     }
   }
 
   /* ------------------------------------------------------------------------
-     7. Active navigation
+     5. Active navigation (observer only — no scroll handler)
      ---------------------------------------------------------------------- */
   function initActiveNav() {
-    var links = Array.prototype.slice.call(document.querySelectorAll(".nav-link"));
-    if (!links.length || !("IntersectionObserver" in window)) return;
+    var links = toArray(document.querySelectorAll(".nav-link"));
+    if (!links.length || !supportsObserver()) return;
 
-    var sections = links
-      .map(function (link) {
-        var id = link.getAttribute("href");
-        return id && id.charAt(0) === "#" ? document.querySelector(id) : null;
-      })
-      .filter(Boolean);
-
-    if (!sections.length) return;
+    var pairs = [];
+    for (var i = 0; i < links.length; i += 1) {
+      var href = links[i].getAttribute("href");
+      if (!href || href.charAt(0) !== "#") continue;
+      var section = document.getElementById(href.slice(1));
+      if (section) pairs.push({ link: links[i], section: section });
+    }
+    if (!pairs.length) return;
 
     function activate(id) {
-      links.forEach(function (link) {
-        var isActive = link.getAttribute("href") === "#" + id;
-        link.classList.toggle("is-active", isActive);
+      for (var k = 0; k < links.length; k += 1) {
+        var isActive = links[k].getAttribute("href") === "#" + id;
+        links[k].classList.toggle("is-active", isActive);
         if (isActive) {
-          link.setAttribute("aria-current", "true");
+          links[k].setAttribute("aria-current", "true");
         } else {
-          link.removeAttribute("aria-current");
+          links[k].removeAttribute("aria-current");
         }
-      });
+      }
     }
 
     try {
       var observer = new IntersectionObserver(
         function (entries) {
           var best = null;
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            if (!best || entry.intersectionRatio > best.intersectionRatio) best = entry;
-          });
+          for (var e = 0; e < entries.length; e += 1) {
+            if (!entries[e].isIntersecting) continue;
+            if (!best || entries[e].intersectionRatio > best.intersectionRatio) {
+              best = entries[e];
+            }
+          }
           if (best && best.target.id) activate(best.target.id);
         },
         { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 1] }
       );
-      sections.forEach(function (section) {
-        observer.observe(section);
-      });
+
+      for (var p = 0; p < pairs.length; p += 1) {
+        observer.observe(pairs[p].section);
+      }
     } catch (err) {
       logError("active nav observer", err);
     }
   }
 
   /* ------------------------------------------------------------------------
-     8. Image fallbacks (drop-in friendly)
+     6. Header elevation state
+     Uses a 1px sentinel at the top of the document so the sticky header can
+     gain its shadow without ever listening to a scroll event.
+     ---------------------------------------------------------------------- */
+  function initHeaderState() {
+    var header = document.getElementById("siteHeader");
+    if (!header || !supportsObserver()) return;
+    if (!document.body) return;
+
+    var sentinel = document.createElement("div");
+    sentinel.setAttribute("aria-hidden", "true");
+    sentinel.style.cssText =
+      "position:absolute;top:0;left:0;width:1px;height:16px;pointer-events:none;opacity:0;";
+    document.body.appendChild(sentinel);
+
+    try {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i += 1) {
+            header.classList.toggle("is-scrolled", !entries[i].isIntersecting);
+          }
+        },
+        { threshold: 0 }
+      );
+      observer.observe(sentinel);
+    } catch (err) {
+      logError("header state observer", err);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     7. Image fallbacks (drop-in friendly)
      ---------------------------------------------------------------------- */
   function markMissing(img) {
     img.classList.add("is-missing");
@@ -731,7 +569,7 @@
   }
 
   function initImageFallbacks() {
-    var images = document.querySelectorAll("img[data-fallback]");
+    var images = toArray(document.querySelectorAll("img[data-fallback]"));
 
     for (var i = 0; i < images.length; i += 1) {
       var img = images[i];
@@ -748,164 +586,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     9. Subtle pointer tilt on the shop-front frame
-     ---------------------------------------------------------------------- */
-  function initTilt() {
-    if (reduceMotion) return;
-
-    var finePointer = isFinePointer();
-    if (!finePointer) return;
-
-    var targets = document.querySelectorAll("[data-tilt]");
-
-    for (var i = 0; i < targets.length; i += 1) {
-      (function (el) {
-        var frame = null;
-
-        function onMove(event) {
-          if (frame) return;
-          frame = window.requestAnimationFrame(function () {
-            frame = null;
-            var rect = el.getBoundingClientRect();
-            if (!rect.width || !rect.height) return;
-            var px = (event.clientX - rect.left) / rect.width - 0.5;
-            var py = (event.clientY - rect.top) / rect.height - 0.5;
-            var rotateY = px * 5;
-            var rotateX = py * -5;
-            el.style.transform =
-              "perspective(1100px) rotateX(" + rotateX.toFixed(2) + "deg) rotateY(" + rotateY.toFixed(2) + "deg)";
-          });
-        }
-
-        function onLeave() {
-          if (frame) {
-            window.cancelAnimationFrame(frame);
-            frame = null;
-          }
-          el.style.transform = "";
-        }
-
-        el.addEventListener("mousemove", onMove);
-        el.addEventListener("mouseleave", onLeave);
-      })(targets[i]);
-    }
-  }
-
-  /* ------------------------------------------------------------------------
-     10. Pointer bloom + trust-card spotlight
-     ---------------------------------------------------------------------- */
-  function initPointerGlow() {
-    if (reduceMotion || !isFinePointer()) return;
-
-    var root = document.documentElement;
-    var frame = null;
-    var lastX = 0;
-    var lastY = 0;
-
-    function paint() {
-      frame = null;
-      var width = window.innerWidth || 1;
-      var height = window.innerHeight || 1;
-      root.style.setProperty("--mx", ((lastX / width) * 100).toFixed(2) + "%");
-      root.style.setProperty("--my", ((lastY / height) * 100).toFixed(2) + "%");
-    }
-
-    window.addEventListener(
-      "mousemove",
-      function (event) {
-        lastX = event.clientX;
-        lastY = event.clientY;
-        if (frame !== null) return;
-        frame = window.requestAnimationFrame(paint);
-      },
-      { passive: true }
-    );
-
-    // Per-card spotlight for the trust grid (gold radial follows the cursor).
-    var cards = document.querySelectorAll("[data-spotlight]");
-    for (var i = 0; i < cards.length; i += 1) {
-      (function (card) {
-        var raf = null;
-        var px = 50;
-        var py = 0;
-
-        function apply() {
-          raf = null;
-          card.style.setProperty("--cx", px.toFixed(2) + "%");
-          card.style.setProperty("--cy", py.toFixed(2) + "%");
-        }
-
-        card.addEventListener(
-          "pointermove",
-          function (event) {
-            var rect = card.getBoundingClientRect();
-            if (!rect.width || !rect.height) return;
-            px = ((event.clientX - rect.left) / rect.width) * 100;
-            py = ((event.clientY - rect.top) / rect.height) * 100;
-            if (raf !== null) return;
-            raf = window.requestAnimationFrame(apply);
-          },
-          { passive: true }
-        );
-
-        card.addEventListener("pointerleave", function () {
-          px = 50;
-          py = 0;
-          if (raf !== null) {
-            window.cancelAnimationFrame(raf);
-            raf = null;
-          }
-          apply();
-        });
-      })(cards[i]);
-    }
-  }
-
-  /* ------------------------------------------------------------------------
-     11. Hero parallax layers
-     ---------------------------------------------------------------------- */
-  function initParallax() {
-    var layers = document.querySelectorAll("[data-parallax]");
-    if (!layers.length) return;
-
-    var parallaxEnabled = !reduceMotion;
-    try {
-      parallaxEnabled =
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
-        window.matchMedia("(min-width: 781px)").matches;
-    } catch (err) {
-      parallaxEnabled = !reduceMotion;
-    }
-    if (!parallaxEnabled) return;
-
-    var frame = null;
-
-    function apply() {
-      frame = null;
-      var scrollY = scrollTopNow();
-
-      for (var i = 0; i < layers.length; i += 1) {
-        var layer = layers[i];
-        var factor = parseFloat(layer.getAttribute("data-parallax"));
-        if (isNaN(factor)) factor = 0;
-        // Clamp travel so the glow never runs away on very long pages.
-        var offset = clamp(scrollY * factor, -160, 160);
-        layer.style.setProperty("--parallax-y", offset.toFixed(2) + "px");
-      }
-    }
-
-    function onScroll() {
-      if (frame) return;
-      frame = window.requestAnimationFrame(apply);
-    }
-
-    apply();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-  }
-
-  /* ------------------------------------------------------------------------
-     12. Footer year
+     8. Footer year
      ---------------------------------------------------------------------- */
   function initYear() {
     var year = document.getElementById("year");
@@ -918,17 +599,13 @@
      ---------------------------------------------------------------------- */
   function boot() {
     var tasks = [
-      ["smooth scroll", initSmoothScroll],
-      ["scroll visuals", initScrollVisuals],
       ["status", initStatus],
       ["carousel", initCarousel],
       ["mobile menu", initMobileMenu],
       ["reveal", initReveal],
       ["active nav", initActiveNav],
+      ["header state", initHeaderState],
       ["image fallbacks", initImageFallbacks],
-      ["pointer glow", initPointerGlow],
-      ["tilt", initTilt],
-      ["parallax", initParallax],
       ["year", initYear]
     ];
 
@@ -938,6 +615,13 @@
       } catch (err) {
         logError(tasks[i][0] + " init", err);
       }
+    }
+
+    // Reveal observers are attached, so the no-JS safety net can step aside.
+    try {
+      document.documentElement.classList.remove("no-js");
+    } catch (err) {
+      logError("no-js class removal", err);
     }
   }
 
