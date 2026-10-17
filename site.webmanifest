@@ -1,0 +1,42 @@
+{
+  "name": "Anaya Bika Point - Best Bike Shop in Kurla West, Mumbai",
+  "short_name": "Anaya Bika Point",
+  "description": "Best 2 wheeler bike shop in Kurla West - two wheeler spare parts, sales, bike repair and service on CST Road, Kurla West, Mumbai.",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
+  "categories": ["shopping", "automotive", "business"],
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Call Anaya Bika Point",
+      "short_name": "Call",
+      "url": "/#visit",
+      "description": "Call +91 9324396437"
+    },
+    {
+      "name": "Store hours",
+      "short_name": "Hours",
+      "url": "/#hours",
+      "description": "Monday to Sunday, 10:00 AM - 9:00 PM. Friday closed."
+    }
+  ]
+}

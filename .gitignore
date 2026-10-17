@@ -1,0 +1,21 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Dependencies (none required, but keeps stray installs out)
+node_modules/
+package-lock.json
+
+# Local env / secrets — never commit real values
+.env
+.env.*
+!.env.example
+
+# Logs & temp
+*.log
+npm-debug.log*
