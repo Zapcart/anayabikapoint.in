@@ -1,7 +1,7 @@
 {
-  "name": "Anaya Bika Point — Parts, Accessories & Service",
-  "short_name": "Anaya Bika Point",
-  "description": "Two-wheeler parts, accessories and service in Kurla West, Mumbai. Enquire and order on WhatsApp.",
+  "name": "Anaya Bike Point — Scooter & Motorcycle Body Kits & Panels",
+  "short_name": "Anaya Bike Point",
+  "description": "Specialist in scooter and motorcycle complete body kits and exterior panels in Kurla West, Mumbai.",
   "id": "./",
   "lang": "en-IN",
   "dir": "ltr",
@@ -11,9 +11,29 @@
   "background_color": "#f7f8f2",
   "theme_color": "#cfef55",
   "categories": ["shopping", "automotive"],
+  "icons": [
+    {
+      "src": "./assets/logo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
   "shortcuts": [
-    {"name": "Explore bike essentials", "short_name": "Shop", "url": "./#shop"},
-    {"name": "Request bike service", "short_name": "Service", "url": "./#services"},
+    {"name": "Explore body kits", "short_name": "Body Kits", "url": "./#shop"},
+    {"name": "Find kit for vehicle", "short_name": "Kit Finder", "url": "./#kitFinder"},
     {"name": "Visit the Kurla West store", "short_name": "Visit", "url": "./#visit"}
   ]
 }
